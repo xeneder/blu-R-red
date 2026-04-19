@@ -16,12 +16,14 @@ if (knockback_vx != 0 || knockback_vy != 0) {
     if (abs(knockback_vy) < 0.1) knockback_vy = 0;
 }
 
-// --- Stun gate: suppress AI, keep animating (idle bob) --------------------
+// --- Decay both gate timers ----------------------------------------------
+if (stun_ttl > 0) stun_ttl = max(0, stun_ttl - _dt);
+if (stop_ttl > 0) stop_ttl = max(0, stop_ttl - _dt);
+
+// --- AI gate: stun OR stop both suppress the chase ------------------------
 is_moving = false;
-var _ai_active = (stun_ttl <= 0);
-if (!_ai_active) {
-    stun_ttl = max(0, stun_ttl - _dt);
-} else if (instance_exists(obj_hero)) {
+var _ai_active = (stun_ttl <= 0 && stop_ttl <= 0);
+if (_ai_active && instance_exists(obj_hero)) {
     var _hero = instance_find(obj_hero, 0);
     var _dist = point_distance(x, y, _hero.x, _hero.y);
 
@@ -77,5 +79,8 @@ if (!_ai_active) {
 }
 
 // --- Bob phase integrates at the current animation period ------------------
-var _period = is_moving ? CRAWLER_MOVE_BOB_PERIOD : CRAWLER_IDLE_BOB_PERIOD;
-bob_phase = frac(bob_phase + _dt / _period);
+// Stopped crawlers are truly frozen — bob pauses so they read as "off".
+if (stop_ttl <= 0) {
+    var _period = is_moving ? CRAWLER_MOVE_BOB_PERIOD : CRAWLER_IDLE_BOB_PERIOD;
+    bob_phase = frac(bob_phase + _dt / _period);
+}

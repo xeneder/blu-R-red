@@ -16,7 +16,8 @@
 // Movement / AI state
 knockback_vx   = 0;
 knockback_vy   = 0;
-stun_ttl       = 0;
+stun_ttl       = 0;   // set by hit-on-hero collisions
+stop_ttl       = 0;   // set by code_stop_enemies — a true freeze (also pauses bob)
 
 is_moving      = false;
 facing_x       = 1;

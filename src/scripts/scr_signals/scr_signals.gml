@@ -33,11 +33,30 @@ function signals_init() {
         codes       : [],
     };
 
-    // Four stub codes, all starting with R, none a prefix of another.
-    signal_register_code("RBB",    "code_3", function() { show_debug_message("[code_3] stub"); });
-    signal_register_code("RBRB",   "code_4", function() { show_debug_message("[code_4] stub"); });
-    signal_register_code("RRBBR",  "code_5", function() { show_debug_message("[code_5] stub"); });
-    signal_register_code("RRRBBR", "code_6", function() { show_debug_message("[code_6] stub"); });
+    // Index 0 — stop: freeze nearby enemies.
+    signal_register_code("RBB", "code_stop", function() {
+        if (!instance_exists(obj_hero)) return;
+        var _h = instance_find(obj_hero, 0);
+        code_stop_enemies(_h.x, _h.y);
+    });
+
+    // Index 1 — push: shove nearby crawlers outward.
+    signal_register_code("RBRB", "code_push", function() {
+        if (!instance_exists(obj_hero)) return;
+        var _h = instance_find(obj_hero, 0);
+        code_push_enemies(_h.x, _h.y);
+    });
+
+    // Index 2 — explode: friendly-fire blasts on threats, detonates mines too.
+    signal_register_code("RRBBR", "code_explode", function() {
+        if (!instance_exists(obj_hero)) return;
+        var _h = instance_find(obj_hero, 0);
+        code_explode_threats(_h.x, _h.y);
+    });
+
+    // Index 3 — reserved: registered so the pattern is known to the prefix-free
+    // recogniser, but does nothing yet.
+    signal_register_code("RRRBBR", "code_reserved", function() {});
 }
 
 /// @param {String}   _pattern   String of 'B' / 'R' characters.
@@ -263,4 +282,74 @@ function ai_grid_refresh() {
     if (_ctrl.ai_grid < 0) return;
     mp_grid_clear_all(_ctrl.ai_grid);
     mp_grid_add_instances(_ctrl.ai_grid, obj_wall, false);
+}
+
+// --- Code effects --------------------------------------------------------
+// All three active codes emanate from the hero's position with a single
+// range. Mines are "friendly" for the explode code in the sense that only
+// their own existing splash (MINE_SPLASH_RADIUS) can hurt the hero — the
+// instigator-explosions on crawlers/towers/doors are visual only.
+
+#macro CODE_RANGE             500
+#macro CODE_STOP_DURATION     4.0
+#macro CODE_PUSH_IMPULSE      18    // ≈ 3× CRAWLER_KNOCKBACK
+#macro CODE_PUSH_STUN         0.5
+
+/// @desc Freeze every crawler and tower within CODE_RANGE for
+///       CODE_STOP_DURATION seconds. Refresh-on-restack (newer stop wins).
+function code_stop_enemies(_cx, _cy) {
+    with (obj_enemy_crawler) {
+        if (point_distance(x, y, _cx, _cy) <= CODE_RANGE) {
+            stop_ttl = max(stop_ttl, CODE_STOP_DURATION);
+        }
+    }
+    with (obj_enemy_tower) {
+        if (point_distance(x, y, _cx, _cy) <= CODE_RANGE) {
+            stop_ttl = max(stop_ttl, CODE_STOP_DURATION);
+        }
+    }
+}
+
+/// @desc Shove every crawler within CODE_RANGE outward from the caster.
+///       Towers are immovable and intentionally skipped. Stun prevents the
+///       crawler from immediately re-acquiring and charging back.
+function code_push_enemies(_cx, _cy) {
+    with (obj_enemy_crawler) {
+        if (point_distance(x, y, _cx, _cy) <= CODE_RANGE) {
+            var _away = point_direction(_cx, _cy, x, y);
+            knockback_vx = lengthdir_x(CODE_PUSH_IMPULSE, _away);
+            knockback_vy = lengthdir_y(CODE_PUSH_IMPULSE, _away);
+            stun_ttl = max(stun_ttl, CODE_PUSH_STUN);
+        }
+    }
+}
+
+/// @desc Friendly-fire explosion on every crawler / tower / blocked door
+///       within CODE_RANGE. Mines in range are also detonated — those use
+///       their own (smaller) splash, which CAN hurt the hero if close.
+function code_explode_threats(_cx, _cy) {
+    with (obj_enemy_crawler) {
+        if (point_distance(x, y, _cx, _cy) <= CODE_RANGE) {
+            instance_create_depth(x, y, -200, obj_explosion);
+            instance_destroy();
+        }
+    }
+    with (obj_enemy_tower) {
+        if (point_distance(x, y, _cx, _cy) <= CODE_RANGE) {
+            instance_create_depth(x, y, -200, obj_explosion);
+            instance_destroy();
+        }
+    }
+    with (obj_door_blocked) {
+        if (point_distance(x, y, _cx, _cy) <= CODE_RANGE) {
+            instance_create_depth(x, y, -200, obj_explosion);
+            // CleanUp on obj_wall fires ai_grid_refresh() so pathing stays current.
+            instance_destroy();
+        }
+    }
+    with (obj_mine) {
+        if (point_distance(x, y, _cx, _cy) <= CODE_RANGE) {
+            mine_detonate(id);
+        }
+    }
 }

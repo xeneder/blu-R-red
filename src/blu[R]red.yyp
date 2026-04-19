@@ -39,6 +39,7 @@
     {"id":{"name":"obj_hero","path":"objects/obj_hero/obj_hero.yy",},},
     {"id":{"name":"obj_mine","path":"objects/obj_mine/obj_mine.yy",},},
     {"id":{"name":"obj_ping","path":"objects/obj_ping/obj_ping.yy",},},
+    {"id":{"name":"obj_pressure_plate","path":"objects/obj_pressure_plate/obj_pressure_plate.yy",},},
     {"id":{"name":"obj_projectile","path":"objects/obj_projectile/obj_projectile.yy",},},
     {"id":{"name":"obj_title_controller","path":"objects/obj_title_controller/obj_title_controller.yy",},},
     {"id":{"name":"obj_totem","path":"objects/obj_totem/obj_totem.yy",},},

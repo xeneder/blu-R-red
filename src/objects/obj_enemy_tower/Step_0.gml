@@ -7,6 +7,10 @@ if (game_is_over()) exit;
 
 var _dt = delta_time / 1000000;
 if (fire_timer > 0) fire_timer = max(0, fire_timer - _dt);
+if (stop_ttl   > 0) stop_ttl   = max(0, stop_ttl   - _dt);
+
+// Frozen by the stop code — no targeting or firing.
+if (stop_ttl > 0) exit;
 
 if (!instance_exists(obj_hero)) exit;
 var _hero = instance_find(obj_hero, 0);

@@ -5,3 +5,4 @@
 #macro TOWER_PROJECTILE_SPEED  6      // px/frame
 
 fire_timer = 0;
+stop_ttl   = 0;   // set by code_stop_enemies — suppresses fire while > 0
