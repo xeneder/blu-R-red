@@ -1,5 +1,8 @@
 /// @description Read input, move with diagonal normalisation, advance animation.
 
+// Sort depth
+event_inherited()
+
 // Freeze all hero logic on game over — no movement, no signals, no animation.
 if (game_is_over()) exit;
 
@@ -7,8 +10,9 @@ if (game_is_over()) exit;
 // stick is idle and keyboard/D-pad are pressed.
 var _v2 = vec2_clamp_unit(ctrl_axis_h(), ctrl_axis_v());
 
-x += _v2.h * move_speed;
-y += _v2.v * move_speed;
+// move_and_collide slides along walls and honours every child of obj_wall —
+// obj_door_blocked always, and obj_door_closed while its mask is active.
+move_and_collide(_v2.h * move_speed, _v2.v * move_speed, obj_wall);
 
 // Bezier-eased ramp so the squash / bob response doesn't snap on/off.
 move_factor = bezier_approach(move_factor, _v2.magnitude, 0.18, BEZIER_EASE_OUT);
