@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_helpers",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_helpers",
+  "parent":{
+    "name":"libraries",
+    "path":"folders/Scripts/libraries.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
