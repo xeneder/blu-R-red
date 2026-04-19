@@ -1,7 +1,7 @@
 /// @description Hero state & animation tuning.
 
 // --- Movement ---
-move_speed = 4;             // pixels per frame at full stick / full digital input
+move_speed = 6;             // pixels per frame at full stick / full digital input
 facing_x   = 1;             // -1 or +1, flips sprite horizontally
 
 // --- Animation state (written by Step, read by Draw) ---

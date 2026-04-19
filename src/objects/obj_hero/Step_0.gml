@@ -1,5 +1,8 @@
 /// @description Read input, move with diagonal normalisation, advance animation.
 
+// Freeze all hero logic on game over — no movement, no signals, no animation.
+if (game_is_over()) exit;
+
 // Analog-first input; scr_controls already falls back to digital when the
 // stick is idle and keyboard/D-pad are pressed.
 var _v2 = vec2_clamp_unit(ctrl_axis_h(), ctrl_axis_v());

@@ -177,3 +177,10 @@ function hero_damage(_amount) {
         }
     }
 }
+
+/// @returns {Bool} True when the game controller has declared game over.
+///                 Safe to call from any event — no-op if no controller exists.
+function game_is_over() {
+    if (!instance_exists(obj_game_controller)) return false;
+    return obj_game_controller.game_over;
+}

@@ -1,5 +1,8 @@
 /// @description Shadow + bezier-smoothed floating + squash-stretch.
 
+// Hero vanishes on game over.
+if (game_is_over()) exit;
+
 // Bob amplitude blends between idle & move; the period itself is already
 // baked into bob_phase (Step advances it at the current rate), so we read
 // the phase directly — no period-jump artefact when switching states.
