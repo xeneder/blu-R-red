@@ -98,3 +98,24 @@ function vec2_clamp_unit(_h, _v) {
     if (_m > 1) return { h: _h / _m, v: _v / _m, magnitude: 1 };
     return { h: _h, v: _v, magnitude: _m };
 }
+
+/// @desc Draw a flat-shaded ring (annulus) at (_x, _y). Uses a triangle strip
+///       so thickness is honoured exactly — unlike draw_circle(outline:true)
+///       which only draws a one-pixel stroke.
+/// @param {Real} _inner      Inner radius (hole).
+/// @param {Real} _outer      Outer radius.
+/// @param {Constant.Color} _col
+/// @param {Real} _alpha
+/// @param {Real} [_segments] Tessellation. 32 is plenty for most rings.
+function draw_ring(_x, _y, _inner, _outer, _col, _alpha, _segments = 32) {
+    if (_outer <= 0 || _alpha <= 0) return;
+    _inner = max(0, _inner);
+    draw_primitive_begin(pr_trianglestrip);
+    for (var _i = 0; _i <= _segments; _i++) {
+        var _ang = 2 * pi * _i / _segments;
+        var _cx = cos(_ang), _sy = sin(_ang);
+        draw_vertex_color(_x + _cx * _outer, _y + _sy * _outer, _col, _alpha);
+        draw_vertex_color(_x + _cx * _inner, _y + _sy * _inner, _col, _alpha);
+    }
+    draw_primitive_end();
+}

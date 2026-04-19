@@ -19,3 +19,8 @@ SHADOW_RADIUS_X = 22;
 SHADOW_RADIUS_Y = 6;
 SHADOW_ALPHA    = 0.35;
 SHADOW_Y_OFFSET = 0;        // tweak if your sprite origin isn't at the feet
+
+// --- Signal-eye blink (overlay flash when emitting a ping) ---
+EYE_BLINK_DURATION = 0.28;  // seconds
+eye_blink_ttl      = 0;
+eye_blink_signal   = SIGNAL.BLUE;

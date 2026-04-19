@@ -12,6 +12,21 @@ move_factor = bezier_approach(move_factor, _v2.magnitude, 0.18, BEZIER_EASE_OUT)
 
 if (abs(_v2.h) > 0.1) facing_x = sign(_v2.h);
 
+// --- Signal pings ----------------------------------------------------------
+// Only flash the eye when the signal actually went out (cooldown may reject).
+if (ctrl_pressed(CTRL.ACTION_1) && signal_emit(x, y, SIGNAL.BLUE) != noone) {
+    eye_blink_signal = SIGNAL.BLUE;
+    eye_blink_ttl    = EYE_BLINK_DURATION;
+}
+if (ctrl_pressed(CTRL.ACTION_2) && signal_emit(x, y, SIGNAL.RED) != noone) {
+    eye_blink_signal = SIGNAL.RED;
+    eye_blink_ttl    = EYE_BLINK_DURATION;
+}
+
+if (eye_blink_ttl > 0) {
+    eye_blink_ttl = max(0, eye_blink_ttl - delta_time / 1000000);
+}
+
 // Advance bob phase at the rate dictated by the *current* period. Integrating
 // the rate avoids the phase jump you'd get from dividing a monotonic clock
 // by a changing period while idle/move blend.

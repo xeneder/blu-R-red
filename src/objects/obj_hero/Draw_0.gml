@@ -36,3 +36,19 @@ draw_set_color(c_white);
 draw_sprite_ext(sprite_index, image_index,
                 x, y + _bob_offset,
                 _xscale, _yscale, 0, c_white, 1);
+
+// --- Eye blink (signal flash) ---
+// Rides with the bob/squash/facing so it reads as part of the body, not a
+// floating decal. Alpha arcs up with ease-out, then fades with ease-in.
+if (eye_blink_ttl > 0) {
+    var _e_t   = 1 - (eye_blink_ttl / EYE_BLINK_DURATION);  // 0..1 across the blink
+    var _split = 0.3;
+    var _e_alpha = (_e_t < _split)
+        ? bezier_ease(_e_t / _split, BEZIER_EASE_OUT)
+        : (1 - bezier_ease((_e_t - _split) / (1 - _split), BEZIER_EASE_IN));
+
+    var _e_spr = (eye_blink_signal == SIGNAL.BLUE) ? spr_hero_eye_blue : spr_hero_eye_red;
+    draw_sprite_ext(_e_spr, 0,
+                    x, y + _bob_offset,
+                    _xscale, _yscale, 0, c_white, _e_alpha);
+}

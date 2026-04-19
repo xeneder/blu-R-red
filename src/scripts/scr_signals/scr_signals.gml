@@ -1,0 +1,179 @@
+/// @description Signal / code framework.
+///
+/// A "signal" is a single coloured ping (blue or red) emitted by the hero.
+/// Signals have two roles:
+///   1. Ambient gameplay effect  — blue pings reveal nearby mines.
+///   2. Pattern input            — signals are appended to a buffer and, if
+///      the buffer matches a registered multi-signal code, its callback fires.
+///
+/// All registered codes start with RED so that a single BLUE press is
+/// unambiguous (it is the base ping and never leads a code). Among the
+/// multi-signal codes, none is a prefix of another — matches resolve the
+/// instant the buffer becomes a full code, with no wait needed.
+///
+/// A safety timeout clears a stale in-progress buffer after `SIGNAL_TIMEOUT`
+/// seconds so the player is never stuck mid-sequence.
+
+#macro SIGNAL_PING_RADIUS_DEFAULT  300
+#macro SIGNAL_PING_SPEED           720    // px/sec — reach 300px in ~0.42s
+#macro SIGNAL_RETURN_PING_RADIUS   90     // small echo emitted by pinged mines
+#macro SIGNAL_TIMEOUT              1.5    // seconds of silence before buffer clears
+#macro SIGNAL_COOLDOWN             0.2   // minimum seconds between code-pushing signals
+
+enum SIGNAL {
+    BLUE,
+    RED,
+}
+
+function signals_init() {
+    global.signals = {
+        buffer      : "",
+        time_since  : 0,
+        cooldown    : 0,
+        codes       : [],
+    };
+
+    // Four stub codes, all starting with R, none a prefix of another.
+    signal_register_code("RBB",    "code_3", function() { show_debug_message("[code_3] stub"); });
+    signal_register_code("RBRB",   "code_4", function() { show_debug_message("[code_4] stub"); });
+    signal_register_code("RRBBR",  "code_5", function() { show_debug_message("[code_5] stub"); });
+    signal_register_code("RRRBBR", "code_6", function() { show_debug_message("[code_6] stub"); });
+}
+
+/// @param {String}   _pattern   String of 'B' / 'R' characters.
+/// @param {String}   _name      Human-readable label (for debug / UI).
+/// @param {Function} _callback  Invoked with no args when the pattern matches.
+function signal_register_code(_pattern, _name, _callback) {
+    if (!variable_global_exists("signals")) signals_init();
+    array_push(global.signals.codes, { pattern: _pattern, name: _name, callback: _callback });
+}
+
+/// @desc Emit a ping in the world. Spawns an obj_ping and — unless
+///       `_is_code` is false — appends the signal to the player's code buffer.
+///       Code-pushing emissions are rate-limited by SIGNAL_COOLDOWN; a
+///       cooled-down call returns `noone` and spawns nothing.
+/// @param {Real} _x
+/// @param {Real} _y
+/// @param {Real} _color        SIGNAL.BLUE or SIGNAL.RED.
+/// @param {Real} [_radius]     Max radius in px.
+/// @param {Bool} [_is_code]    If true, also push to code buffer. Mine echoes should pass false.
+function signal_emit(_x, _y, _color, _radius = SIGNAL_PING_RADIUS_DEFAULT, _is_code = true) {
+    if (!variable_global_exists("signals")) signals_init();
+
+    if (_is_code && global.signals.cooldown > 0) return noone;
+
+    var _p = instance_create_depth(_x, _y, -100, obj_ping);
+    _p.max_radius = _radius;
+    _p.ping_color = _color;
+
+    if (_is_code) {
+        var _ch = (_color == SIGNAL.BLUE) ? "B" : "R";
+        __signal_push(_ch);
+        global.signals.cooldown = SIGNAL_COOLDOWN;
+    }
+    return _p;
+}
+
+/// @returns {Bool} True when the player may emit a fresh code-pushing signal.
+function signal_ready() {
+    if (!variable_global_exists("signals")) signals_init();
+    return global.signals.cooldown <= 0;
+}
+
+/// @desc Call once per frame (Begin Step of obj_game_controller). Decays the
+///       emit cooldown and clears a stale in-progress buffer after
+///       SIGNAL_TIMEOUT seconds of silence.
+function signal_tick(_dt_seconds) {
+    if (!variable_global_exists("signals")) signals_init();
+    var _s = global.signals;
+
+    if (_s.cooldown > 0) _s.cooldown = max(0, _s.cooldown - _dt_seconds);
+
+    if (_s.buffer == "") return;
+    _s.time_since += _dt_seconds;
+    if (_s.time_since >= SIGNAL_TIMEOUT) _s.buffer = "";
+}
+
+/// @returns {String} Current in-progress buffer (for debug/HUD).
+function signal_buffer() {
+    if (!variable_global_exists("signals")) signals_init();
+    return global.signals.buffer;
+}
+
+// --- internal -----------------------------------------------------------
+
+function __signal_push(_char) {
+    var _s = global.signals;
+    _s.buffer += _char;
+    _s.time_since = 0;
+    __signal_try_match();
+}
+
+function __signal_try_match() {
+    var _s = global.signals;
+    var _buf = _s.buffer;
+
+    // Exact match against any registered code? Fire & clear.
+    var _n = array_length(_s.codes);
+    for (var _i = 0; _i < _n; _i++) {
+        var _c = _s.codes[_i];
+        if (_buf == _c.pattern) {
+            _c.callback();
+            _s.buffer = "";
+            return;
+        }
+    }
+
+    // Not a prefix of any code? Discard — the player can't be mid-sequence.
+    if (!__signal_is_prefix_of_any(_buf)) _s.buffer = "";
+}
+
+function __signal_is_prefix_of_any(_buf) {
+    var _s = global.signals;
+    var _n = array_length(_s.codes);
+    var _len = string_length(_buf);
+    for (var _i = 0; _i < _n; _i++) {
+        if (string_copy(_s.codes[_i].pattern, 1, _len) == _buf) return true;
+    }
+    return false;
+}
+
+// --- gameplay helpers ---------------------------------------------------
+
+/// @desc Convenience: returns GM color constant for a SIGNAL enum value.
+function signal_color(_signal_enum) {
+    return (_signal_enum == SIGNAL.BLUE) ? make_color_rgb(80, 170, 255)
+                                         : make_color_rgb(255, 80,  80);
+}
+
+/// @desc Called by obj_ping when its leading edge crosses a mine.
+///       Reveals the mine once, then spawns a small non-code, non-activating
+///       echo so the player can locate it without chain-triggering neighbours.
+function mine_reveal(_mine) {
+    if (!instance_exists(_mine)) return;
+    with (_mine) {
+        if (!revealed) {
+            revealed = true;
+            reveal_cd = 0.1;
+            var _p = instance_create_depth(x, y, -100, obj_ping);
+            _p.max_radius      = SIGNAL_RETURN_PING_RADIUS;
+            _p.ping_color      = SIGNAL.BLUE;
+            _p.activates_mines = false;
+        }
+    }
+}
+
+/// @desc Damage the hero by `_amount` HP. Triggers game over on reaching zero.
+///       No-op if obj_game_controller isn't present.
+function hero_damage(_amount) {
+    if (!instance_exists(obj_game_controller)) return;
+    with (obj_game_controller) {
+        if (!game_over) {
+            hp = max(0, hp - _amount);
+            if (hp <= 0) {
+                game_over = true;
+                game_over_time = 0;
+            }
+        }
+    }
+}
