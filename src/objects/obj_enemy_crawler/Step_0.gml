@@ -1,5 +1,8 @@
 /// @description Knockback physics, stun gate, chase / pathfind AI, anim phase.
 
+// Sort by depth
+event_inherited()
+
 if (game_is_over()) exit;
 
 var _dt = delta_time / 1000000;

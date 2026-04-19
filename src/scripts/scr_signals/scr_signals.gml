@@ -18,7 +18,7 @@
 #macro SIGNAL_PING_SPEED           720    // px/sec — reach 300px in ~0.42s
 #macro SIGNAL_RETURN_PING_RADIUS   90     // small echo emitted by pinged mines
 #macro SIGNAL_TIMEOUT              1.5    // seconds of silence before buffer clears
-#macro SIGNAL_COOLDOWN             0.2   // minimum seconds between code-pushing signals
+#macro SIGNAL_COOLDOWN             0.05   // minimum seconds between code-pushing signals
 
 enum SIGNAL {
     BLUE,
@@ -146,6 +146,27 @@ function signal_color(_signal_enum) {
                                          : make_color_rgb(255, 80,  80);
 }
 
+// --- Totem tuning -------------------------------------------------------
+#macro TOTEM_SYMBOL_SHOW   0.34   // seconds each eye is visible
+#macro TOTEM_SYMBOL_GAP    0.18   // dark pause between consecutive symbols
+
+/// @desc Called by obj_ping when its leading edge crosses a totem. Starts
+///       the code-playback cycle if the totem isn't already busy (subsequent
+///       pings during playback are ignored — user-specified).
+function totem_trigger(_totem) {
+    if (!instance_exists(_totem)) return;
+    if (!variable_global_exists("signals")) signals_init();
+    var _codes = global.signals.codes;
+    with (_totem) {
+        if (playback_active) exit;
+        var _idx = show_code;
+        if (_idx < 0 || _idx >= array_length(_codes)) exit;
+        playback_pattern = _codes[_idx].pattern;
+        playback_active  = true;
+        playback_t       = 0;
+    }
+}
+
 /// @desc Called by obj_ping when its leading edge crosses a mine.
 ///       Reveals the mine once, then spawns a small non-code, non-activating
 ///       echo so the player can locate it without chain-triggering neighbours.
@@ -154,7 +175,7 @@ function mine_reveal(_mine) {
     with (_mine) {
         if (!revealed) {
             revealed = true;
-            reveal_cd = 0.1;
+            reveal_cd = 0.5;
             var _p = instance_create_depth(x, y, -100, obj_ping);
             _p.max_radius      = SIGNAL_RETURN_PING_RADIUS;
             _p.ping_color      = SIGNAL.BLUE;

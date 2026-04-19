@@ -25,6 +25,7 @@
     {"name":"inst_23C48F7","path":"rooms/room_game/room_game.yy",},
     {"name":"inst_1D1D1186","path":"rooms/room_game/room_game.yy",},
     {"name":"inst_5DA471AB","path":"rooms/room_game/room_game.yy",},
+    {"name":"inst_56ECA4D0","path":"rooms/room_game/room_game.yy",},
   ],
   "isDnd":false,
   "layers":[
@@ -48,6 +49,7 @@
         {"$GMRInstance":"v4","%Name":"inst_23C48F7","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_23C48F7","objectId":{"name":"obj_enemy_crawler","path":"objects/obj_enemy_crawler/obj_enemy_crawler.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":6880.0,"y":4320.0,},
         {"$GMRInstance":"v4","%Name":"inst_1D1D1186","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_1D1D1186","objectId":{"name":"obj_enemy_crawler","path":"objects/obj_enemy_crawler/obj_enemy_crawler.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":5952.0,"y":3360.0,},
         {"$GMRInstance":"v4","%Name":"inst_5DA471AB","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_5DA471AB","objectId":{"name":"obj_enemy_tower","path":"objects/obj_enemy_tower/obj_enemy_tower.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":5376.0,"y":3584.0,},
+        {"$GMRInstance":"v4","%Name":"inst_56ECA4D0","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_56ECA4D0","objectId":{"name":"obj_totem","path":"objects/obj_totem/obj_totem.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":5088.0,"y":4480.0,},
       ],"layers":[],"name":"Instances","properties":[],"resourceType":"GMRInstanceLayer","resourceVersion":"2.0","userdefinedDepth":false,"visible":true,},
     {"$GMRAssetLayer":"","%Name":"Bg_decor","assets":[
         {"$GMRSpriteGraphic":"v1","%Name":"graphic_6B6D91FF","animationSpeed":1.0,"colour":4294967295,"frozen":false,"headPosition":0.0,"ignore":false,"inheritedItemId":null,"inheritItemSettings":false,"name":"graphic_6B6D91FF","resourceType":"GMRSpriteGraphic","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0,"scaleY":1.0,"spriteId":{"name":"spr_grass","path":"sprites/spr_grass/spr_grass.yy",},"x":6144.0,"y":4416.0,},

@@ -11,13 +11,19 @@ var _t = clamp(lifetime / life_total, 0, 1);
 radius_prev = radius;
 radius = bezier_ease(_t, BEZIER_EASE_OUT) * max_radius;
 
-// Mines react only to blue pings that are flagged as activating.
-// (A mine's own echo ping is non-activating so it doesn't chain-trigger its neighbours.)
+// World-interacting blue pings (player-emitted, not mine echoes) trigger
+// receivers once each, the frame their leading edge sweeps over them.
 if (ping_color == SIGNAL.BLUE && activates_mines) {
     with (obj_mine) {
         var _d = point_distance(x, y, other.x, other.y);
         if (_d <= other.radius && _d > other.radius_prev) {
             mine_reveal(id);
+        }
+    }
+    with (obj_totem) {
+        var _d = point_distance(x, y, other.x, other.y);
+        if (_d <= other.radius && _d > other.radius_prev) {
+            totem_trigger(id);
         }
     }
 }

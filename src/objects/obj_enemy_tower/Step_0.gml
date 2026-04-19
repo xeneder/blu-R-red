@@ -1,5 +1,8 @@
 /// @description Range + LOS gate; fire on cooldown.
 
+// Sort by depth
+event_inherited()
+
 if (game_is_over()) exit;
 
 var _dt = delta_time / 1000000;
