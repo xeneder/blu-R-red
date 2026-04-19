@@ -99,6 +99,28 @@ function vec2_clamp_unit(_h, _v) {
     return { h: _h, v: _v, magnitude: _m };
 }
 
+/// @desc Spawn an obj_explosion with custom-sized particles. Overwrites the
+///       default mine-scale particles its Create event produced with a
+///       caller-tuned set. Use for small impacts (projectile bursts, etc.).
+function spawn_burst(_x, _y, _count, _size_min, _size_max, _life_min, _life_max, _speed_min, _speed_max) {
+    var _e = instance_create_depth(_x, _y, -200, obj_explosion);
+    _e.particles = [];
+    for (var _i = 0; _i < _count; _i++) {
+        var _ang = random(360);
+        var _spd = random_range(_speed_min, _speed_max);
+        array_push(_e.particles, {
+            px       : _x,
+            py       : _y,
+            vx       : lengthdir_x(_spd, _ang),
+            vy       : lengthdir_y(_spd, _ang),
+            age      : 0,
+            life     : random_range(_life_min, _life_max),
+            max_size : random_range(_size_min, _size_max),
+        });
+    }
+    return _e;
+}
+
 /// @desc Draw a flat-shaded ring (annulus) at (_x, _y). Uses a triangle strip
 ///       so thickness is honoured exactly — unlike draw_circle(outline:true)
 ///       which only draws a one-pixel stroke.

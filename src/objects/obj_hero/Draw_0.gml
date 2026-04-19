@@ -35,10 +35,16 @@ draw_ellipse(x - _sx, _sy_pos - _sy, x + _sx, _sy_pos + _sy, false);
 draw_set_alpha(1);
 draw_set_color(c_white);
 
+// --- I-frame flash: fast sinusoidal alpha ramp over the invincibility window ---
+var _body_alpha = 1;
+if (iframe_ttl > 0) {
+    _body_alpha = 0.3 + 0.7 * (0.5 + 0.5 * sin(iframe_ttl * 30));
+}
+
 // --- Hero sprite ---
 draw_sprite_ext(sprite_index, image_index,
                 x, y + _bob_offset,
-                _xscale, _yscale, 0, c_white, 1);
+                _xscale, _yscale, 0, c_white, _body_alpha);
 
 // --- Eye blink (signal flash) ---
 // Rides with the bob/squash/facing so it reads as part of the body, not a
@@ -53,5 +59,5 @@ if (eye_blink_ttl > 0) {
     var _e_spr = (eye_blink_signal == SIGNAL.BLUE) ? spr_hero_eye_blue : spr_hero_eye_red;
     draw_sprite_ext(_e_spr, 0,
                     x, y + _bob_offset,
-                    _xscale, _yscale, 0, c_white, _e_alpha);
+                    _xscale, _yscale, 0, c_white, _e_alpha * _body_alpha);
 }

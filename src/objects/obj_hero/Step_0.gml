@@ -12,7 +12,17 @@ var _v2 = vec2_clamp_unit(ctrl_axis_h(), ctrl_axis_v());
 
 // move_and_collide slides along walls and honours every child of obj_wall —
 // obj_door_blocked always, and obj_door_closed while its mask is active.
-move_and_collide(_v2.h * move_speed, _v2.v * move_speed, obj_wall);
+// Knockback is additive: the player can still nudge against it but the
+// hit's impulse carries for a few frames before KNOCKBACK_DAMP wins.
+move_and_collide(_v2.h * move_speed + knockback_vx,
+                 _v2.v * move_speed + knockback_vy, obj_wall);
+knockback_vx *= KNOCKBACK_DAMP;
+knockback_vy *= KNOCKBACK_DAMP;
+if (abs(knockback_vx) < 0.1) knockback_vx = 0;
+if (abs(knockback_vy) < 0.1) knockback_vy = 0;
+
+// Tick i-frame timer.
+if (iframe_ttl > 0) iframe_ttl = max(0, iframe_ttl - delta_time / 1000000);
 
 // Bezier-eased ramp so the squash / bob response doesn't snap on/off.
 move_factor = bezier_approach(move_factor, _v2.magnitude, 0.18, BEZIER_EASE_OUT);

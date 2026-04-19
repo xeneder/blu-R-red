@@ -163,19 +163,43 @@ function mine_reveal(_mine) {
     }
 }
 
-/// @desc Damage the hero by `_amount` HP. Triggers game over on reaching zero.
-///       No-op if obj_game_controller isn't present.
-function hero_damage(_amount) {
-    if (!instance_exists(obj_game_controller)) return;
-    with (obj_game_controller) {
-        if (!game_over) {
-            hp = max(0, hp - _amount);
-            if (hp <= 0) {
-                game_over = true;
-                game_over_time = 0;
+// --- Combat tuning -------------------------------------------------------
+#macro HERO_IFRAME_DURATION    1.0
+#macro HERO_KNOCKBACK          12      // px/frame initial velocity
+#macro KNOCKBACK_DAMP          0.82    // per-frame velocity multiplier
+#macro MINE_SPLASH_RADIUS      110
+#macro AI_GRID_CELL            32
+
+/// @desc Damage the hero. `_from_x / _from_y` drive the knockback direction.
+///       Returns true if damage actually applied (false while i-framed or
+///       with no controller / no hero present).
+function hero_damage(_amount, _from_x, _from_y) {
+    if (!instance_exists(obj_hero)) return false;
+    var _hero = instance_find(obj_hero, 0);
+    if (_hero.iframe_ttl > 0) return false;
+
+    // I-frames + knockback away from the damage source.
+    _hero.iframe_ttl = HERO_IFRAME_DURATION;
+    var _dx = _hero.x - _from_x;
+    var _dy = _hero.y - _from_y;
+    var _d  = point_distance(0, 0, _dx, _dy);
+    if (_d > 0) {
+        _hero.knockback_vx = _dx / _d * HERO_KNOCKBACK;
+        _hero.knockback_vy = _dy / _d * HERO_KNOCKBACK;
+    }
+
+    if (instance_exists(obj_game_controller)) {
+        with (obj_game_controller) {
+            if (!game_over) {
+                hp = max(0, hp - _amount);
+                if (hp <= 0) {
+                    game_over = true;
+                    game_over_time = 0;
+                }
             }
         }
     }
+    return true;
 }
 
 /// @returns {Bool} True when the game controller has declared game over.
@@ -183,4 +207,39 @@ function hero_damage(_amount) {
 function game_is_over() {
     if (!instance_exists(obj_game_controller)) return false;
     return obj_game_controller.game_over;
+}
+
+/// @desc Canonical entry point for "make this mine go off now". Spawns the
+///       big explosion, shakes the camera, and does a splash-damage check
+///       against the hero. Safe to call with any mine id (hero contact,
+///       crawler contact, future triggers).
+function mine_detonate(_mine) {
+    if (!instance_exists(_mine)) return;
+    with (_mine) {
+        instance_create_depth(x, y, -200, obj_explosion);
+
+        if (instance_exists(obj_camera)) {
+            with (obj_camera) { camera.shake(14); }
+        }
+
+        if (instance_exists(obj_hero)) {
+            var _hero = instance_find(obj_hero, 0);
+            if (point_distance(x, y, _hero.x, _hero.y) < MINE_SPLASH_RADIUS) {
+                hero_damage(1, x, y);
+            }
+        }
+
+        instance_destroy();
+    }
+}
+
+/// @desc Rebuild the shared AI navigation grid from every live obj_wall
+///       (including doors whose mask is currently active). Cheap enough to
+///       call on every door state change and every wall destruction.
+function ai_grid_refresh() {
+    if (!instance_exists(obj_game_controller)) return;
+    var _ctrl = instance_find(obj_game_controller, 0);
+    if (_ctrl.ai_grid < 0) return;
+    mp_grid_clear_all(_ctrl.ai_grid);
+    mp_grid_add_instances(_ctrl.ai_grid, obj_wall, false);
 }

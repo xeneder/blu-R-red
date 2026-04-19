@@ -1,19 +1,17 @@
 {
   "$GMObject":"",
-  "%Name":"obj_wall",
-  "eventList":[
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":12,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-  ],
+  "%Name":"obj_totem",
+  "eventList":[],
   "managed":true,
-  "name":"obj_wall",
+  "name":"obj_totem",
   "overriddenProperties":[],
   "parent":{
     "name":"Objects",
     "path":"folders/Objects.yy",
   },
   "parentObjectId":{
-    "name":"obj_depth",
-    "path":"objects/obj_depth/obj_depth.yy",
+    "name":"obj_wall",
+    "path":"objects/obj_wall/obj_wall.yy",
   },
   "persistent":false,
   "physicsAngularDamping":0.1,
@@ -33,8 +31,8 @@
   "resourceVersion":"2.0",
   "solid":true,
   "spriteId":{
-    "name":"spr_wall",
-    "path":"sprites/spr_wall/spr_wall.yy",
+    "name":"spr_totem",
+    "path":"sprites/spr_totem/spr_totem.yy",
   },
   "spriteMaskId":null,
   "visible":true,

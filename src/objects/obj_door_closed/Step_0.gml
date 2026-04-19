@@ -24,8 +24,14 @@ if (anim_t < 1) {
 // --- Toggle collision mask at the halfway point ---------------------------
 // Closed half of the cycle blocks the hero; open half is passable. This
 // means a door mid-close starts re-blocking the instant it passes 50%.
+// When the mask actually flips, rebuild the AI grid so crawlers route
+// through newly-opened doors and avoid newly-closed ones.
 var _collision_active = (open_progress < 0.5);
-sprite_index = _collision_active ? spr_door_blocked : -1;
+var _was_active       = (sprite_index != -1);
+if (_was_active != _collision_active) {
+    sprite_index = _collision_active ? spr_door_blocked : -1;
+    ai_grid_refresh();
+}
 
 // --- Push the hero out if the door closed on them -------------------------
 // move_and_collide handles the "hero walks into closed door" case. This

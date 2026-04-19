@@ -24,3 +24,8 @@ SHADOW_Y_OFFSET = 0;        // tweak if your sprite origin isn't at the feet
 EYE_BLINK_DURATION = 0.28;  // seconds
 eye_blink_ttl      = 0;
 eye_blink_signal   = SIGNAL.BLUE;
+
+// --- Damage response (i-frames + knockback) ---
+iframe_ttl   = 0;       // seconds remaining of invincibility
+knockback_vx = 0;       // px/frame; decays via KNOCKBACK_DAMP in Step
+knockback_vy = 0;
