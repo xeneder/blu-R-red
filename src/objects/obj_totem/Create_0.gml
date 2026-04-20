@@ -9,6 +9,7 @@ event_inherited();
 if (!variable_instance_exists(id, "show_code")) show_code = 0;
 
 // --- Playback state ---
-playback_active  = false;
-playback_pattern = "";
-playback_t       = 0;
+playback_active         = false;
+playback_pattern        = "";
+playback_t              = 0;
+playback_last_symbol_i  = -1;   // tracks which symbol's SFX has been fired

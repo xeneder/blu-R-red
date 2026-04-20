@@ -26,4 +26,7 @@ if (fire_timer <= 0) {
     _p.vx = lengthdir_x(TOWER_PROJECTILE_SPEED, _dir);
     _p.vy = lengthdir_y(TOWER_PROJECTILE_SPEED, _dir);
     fire_timer = TOWER_FIRE_COOLDOWN;
+
+    // Quieter than the full-volume explosions/pings — towers fire often.
+    audio_play_sound(sfx_shoot, 1, false, 0.6, 0, random_range(0.93, 1.07));
 }

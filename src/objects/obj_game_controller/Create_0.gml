@@ -19,6 +19,10 @@ if (variable_global_exists("restart_fade_in") && global.restart_fade_in) {
 
 signals_init();
 
+// --- BGM — restart cleanly so the post-death gain duck is cleared. ---
+audio_stop_sound(bgm_main);
+audio_play_sound(bgm_main, 1, true);
+
 // --- Shared AI navigation grid ---
 // Singleton. Every crawler mp_grid_path's against this one. ai_grid_refresh()
 // is called here on init, on every door mask-toggle (see obj_door_closed's

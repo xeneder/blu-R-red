@@ -89,6 +89,10 @@ function signal_emit(_x, _y, _color, _radius = SIGNAL_PING_RADIUS_DEFAULT, _is_c
         var _ch = (_color == SIGNAL.BLUE) ? "B" : "R";
         __signal_push(_ch);
         global.signals.cooldown = SIGNAL_COOLDOWN;
+
+        // Player-emitted pings only — mine echoes stay silent (is_code == false).
+        var _snd = (_color == SIGNAL.BLUE) ? sfx_ping_blue : sfx_ping_red;
+        audio_play_sound(_snd, 1, false, 1, 0, random_range(0.93, 1.07));
     }
     return _p;
 }
@@ -180,9 +184,10 @@ function totem_trigger(_totem) {
         if (playback_active) exit;
         var _idx = show_code;
         if (_idx < 0 || _idx >= array_length(_codes)) exit;
-        playback_pattern = _codes[_idx].pattern;
-        playback_active  = true;
-        playback_t       = 0;
+        playback_pattern       = _codes[_idx].pattern;
+        playback_active        = true;
+        playback_t             = 0;
+        playback_last_symbol_i = -1;
     }
 }
 
@@ -198,6 +203,7 @@ function mine_reveal(_mine) {
             _p.max_radius      = SIGNAL_RETURN_PING_RADIUS;
             _p.ping_color      = SIGNAL.BLUE;
             _p.activates_mines = false;
+            audio_play_sound(sfx_reveal, 1, false);
         }
     }
 }
@@ -227,6 +233,8 @@ function hero_damage(_amount, _from_x, _from_y) {
         _hero.knockback_vy = _dy / _d * HERO_KNOCKBACK;
     }
 
+    audio_play_sound(sfx_hurt, 1, false, 1, 0, random_range(0.93, 1.07));
+
     if (instance_exists(obj_game_controller)) {
         with (obj_game_controller) {
             if (!game_over) {
@@ -234,6 +242,8 @@ function hero_damage(_amount, _from_x, _from_y) {
                 if (hp <= 0) {
                     game_over = true;
                     game_over_time = 0;
+                    // Duck the BGM so the world reads as paused.
+                    if (audio_is_playing(bgm_main)) audio_sound_gain(bgm_main, 0.25, 500);
                 }
             }
         }
@@ -256,6 +266,7 @@ function mine_detonate(_mine) {
     if (!instance_exists(_mine)) return;
     with (_mine) {
         instance_create_depth(x, y, -200, obj_explosion);
+        audio_play_sound(sfx_explode, 1, false, 1, 0, random_range(0.93, 1.07));
 
         if (instance_exists(obj_camera)) {
             with (obj_camera) { camera.shake(14); }

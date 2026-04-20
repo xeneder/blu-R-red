@@ -14,8 +14,8 @@
   "exportDir":"",
   "name":"bgm_main",
   "parent":{
-    "name":"blu[R]red",
-    "path":"blu[R]red.yyp",
+    "name":"Sounds",
+    "path":"folders/Sounds.yy",
   },
   "preload":false,
   "resourceType":"GMSound",
