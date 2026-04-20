@@ -99,6 +99,45 @@ function vec2_clamp_unit(_h, _v) {
     return { h: _h, v: _v, magnitude: _m };
 }
 
+/// @desc Draw a flat-shaded, rotated rectangle. Useful for confetti / debris
+///       where draw_circle / draw_rectangle don't support rotation.
+function draw_rect_rot(_x, _y, _w, _h, _ang_deg, _col, _alpha) {
+    var _hw = _w * 0.5;
+    var _hh = _h * 0.5;
+    var _ca = dcos(_ang_deg);
+    var _sa = -dsin(_ang_deg);   // GameMaker Y is inverted vs math convention
+
+    var _x1 = _x + (-_hw) * _ca - (-_hh) * _sa;
+    var _y1 = _y + (-_hw) * _sa + (-_hh) * _ca;
+    var _x2 = _x + ( _hw) * _ca - (-_hh) * _sa;
+    var _y2 = _y + ( _hw) * _sa + (-_hh) * _ca;
+    var _x3 = _x + ( _hw) * _ca - ( _hh) * _sa;
+    var _y3 = _y + ( _hw) * _sa + ( _hh) * _ca;
+    var _x4 = _x + (-_hw) * _ca - ( _hh) * _sa;
+    var _y4 = _y + (-_hw) * _sa + ( _hh) * _ca;
+
+    draw_primitive_begin(pr_trianglestrip);
+    draw_vertex_color(_x1, _y1, _col, _alpha);
+    draw_vertex_color(_x2, _y2, _col, _alpha);
+    draw_vertex_color(_x4, _y4, _col, _alpha);
+    draw_vertex_color(_x3, _y3, _col, _alpha);
+    draw_primitive_end();
+}
+
+/// @returns {Constant.Color} A random bright confetti color.
+function confetti_color() {
+    static _palette = [
+        make_color_rgb(255,  80,  90),
+        make_color_rgb( 80, 170, 255),
+        make_color_rgb(255, 220,  80),
+        make_color_rgb(120, 230, 120),
+        make_color_rgb(255, 140,  80),
+        make_color_rgb(220, 120, 220),
+        make_color_rgb( 80, 230, 230),
+    ];
+    return _palette[irandom(array_length(_palette) - 1)];
+}
+
 /// @desc Spawn an obj_explosion with custom-sized particles. Overwrites the
 ///       default mine-scale particles its Create event produced with a
 ///       caller-tuned set. Use for small impacts (projectile bursts, etc.).

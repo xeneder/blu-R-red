@@ -19,7 +19,7 @@ for (var _i = 0; _i < HP_MAX; _i++) {
 
 draw_set_color(c_black);
 draw_set_font(fnt_main);
-draw_text(120, 120, fps)
+//draw_text(120, 120, fps)
 
 
 // --- Game over overlay ----------------------------------------------------
@@ -57,6 +57,48 @@ if (game_over) {
     draw_set_halign(fa_left);
     draw_set_valign(fa_top);
     draw_set_alpha(1);
+}
+
+// --- Victory overlay ------------------------------------------------------
+// Lighter dim than game over, pulsing "VICTORY!", confetti rains on top.
+if (victory) {
+    var _gwv = display_get_gui_width();
+    var _ghv = display_get_gui_height();
+
+    var _vt    = clamp(victory_time / 0.8, 0, 1);
+    var _vfade = bezier_ease(_vt, BEZIER_EASE_OUT);
+
+    draw_set_color(c_black);
+    draw_set_alpha(_vfade * 0.45);
+    draw_rectangle(0, 0, _gwv, _ghv, false);
+
+    draw_set_alpha(_vfade);
+    draw_set_color(c_white);
+    draw_set_font(fnt_main);
+    draw_set_halign(fa_center);
+    draw_set_valign(fa_middle);
+    draw_text_transformed(_gwv * 0.5, _ghv * 0.5, "VICTORY!", 3.5, 3.5, 0);
+
+    var _v_prompt_reveal = clamp((victory_time - RESTART_INPUT_DELAY) / 0.4, 0, 1);
+    if (_v_prompt_reveal > 0) {
+        var _v_pulse = 0.75 + 0.25 * (0.5 + 0.5 * sin(victory_time * 4));
+        draw_set_alpha(_vfade * _v_prompt_reveal * _v_pulse);
+        draw_text_transformed(_gwv * 0.5, _ghv * 0.5 + 120,
+                              "PRESS CONFIRM", 1.2, 1.2, 0);
+    }
+
+    draw_set_halign(fa_left);
+    draw_set_valign(fa_top);
+    draw_set_alpha(1);
+
+    // Confetti shower — drawn over the overlay and text.
+    var _n = array_length(confetti_shower);
+    for (var _ci = 0; _ci < _n; _ci++) {
+        var _p = confetti_shower[_ci];
+        var _fs = _p.life * 0.7;
+        var _a  = (_p.age < _fs) ? 1 : 1 - (_p.age - _fs) / (_p.life - _fs);
+        draw_rect_rot(_p.px, _p.py, _p.w, _p.h, _p.rot, _p.col, _a);
+    }
 }
 
 // --- Scene transition overlay (drawn over everything, including game over) ---

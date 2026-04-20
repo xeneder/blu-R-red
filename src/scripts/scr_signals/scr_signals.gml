@@ -256,6 +256,33 @@ function game_is_over() {
     return obj_game_controller.game_over;
 }
 
+/// @returns {Bool} True while the victory screen is up.
+function game_is_victory() {
+    if (!instance_exists(obj_game_controller)) return false;
+    return obj_game_controller.victory;
+}
+
+/// @returns {Bool} Either end-state. Use for freezing per-frame logic
+///                 (hero input, enemy AI) without caring which one happened.
+function game_is_ended() {
+    return game_is_over() || game_is_victory();
+}
+
+/// @desc Fires the victory cascade — sets the flag on the controller so the
+///       overlay starts, spawns the world-space confetti burst at the pickup
+///       position, plays the fanfare, and ducks the BGM so sfx_victory lands.
+function victory_trigger(_flag_x, _flag_y) {
+    if (!instance_exists(obj_game_controller)) return;
+    with (obj_game_controller) {
+        if (victory) exit;
+        victory      = true;
+        victory_time = 0;
+    }
+    instance_create_depth(_flag_x, _flag_y, -200, obj_confetti_burst);
+    audio_play_sound(sfx_victory, 1, false);
+    if (audio_is_playing(bgm_main)) audio_sound_gain(bgm_main, 0.35, 500);
+}
+
 /// @desc Canonical entry point for "make this mine go off now". Spawns the
 ///       big explosion, shakes the camera, and does a splash-damage check
 ///       against the hero. Safe to call with any mine id (hero contact,

@@ -6,6 +6,17 @@ hp             = HP_MAX;
 game_over      = false;
 game_over_time = 0;       // seconds since game over started (for ease-in of text)
 
+// --- Victory state ---
+#macro VICTORY_SHOWER_SPAWN_PER_SEC   22
+#macro VICTORY_SHOWER_LIFE_MIN        3.0
+#macro VICTORY_SHOWER_LIFE_MAX        5.0
+#macro VICTORY_SHOWER_GRAVITY         120
+
+victory              = false;
+victory_time         = 0;
+confetti_shower      = [];
+confetti_spawn_accum = 0;
+
 // --- Scene transition state ---
 // If we just came back from a room_restart, start with a black-to-clear
 // fade-in. Otherwise idle. global.restart_fade_in is set by the fade-OUT

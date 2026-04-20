@@ -3,8 +3,8 @@
 // Sort depth
 event_inherited()
 
-// Freeze all hero logic on game over — no movement, no signals, no animation.
-if (game_is_over()) exit;
+// Freeze all hero logic on either end-state — no movement, no signals, no animation.
+if (game_is_ended()) exit;
 
 // Analog-first input; scr_controls already falls back to digital when the
 // stick is idle and keyboard/D-pad are pressed.

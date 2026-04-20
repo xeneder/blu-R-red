@@ -3,7 +3,7 @@
 // Sort by depth
 event_inherited()
 
-if (game_is_over()) exit;
+if (game_is_ended()) exit;
 
 var _dt = delta_time / 1000000;
 

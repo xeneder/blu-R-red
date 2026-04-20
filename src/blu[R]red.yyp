@@ -30,6 +30,7 @@
   "resources":[
     {"id":{"name":"fnt_main","path":"fonts/fnt_main/fnt_main.yy",},},
     {"id":{"name":"obj_camera","path":"objects/obj_camera/obj_camera.yy",},},
+    {"id":{"name":"obj_confetti_burst","path":"objects/obj_confetti_burst/obj_confetti_burst.yy",},},
     {"id":{"name":"obj_depth","path":"objects/obj_depth/obj_depth.yy",},},
     {"id":{"name":"obj_door_blocked","path":"objects/obj_door_blocked/obj_door_blocked.yy",},},
     {"id":{"name":"obj_door_closed","path":"objects/obj_door_closed/obj_door_closed.yy",},},
