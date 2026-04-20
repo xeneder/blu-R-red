@@ -9,5 +9,5 @@ transition_t     = 0;
 
 // BGM — start if not already playing, un-duck if we came back from a
 // game-over (gameplay ducks to 0.25 on death).
-if (!audio_is_playing(bgm_main)) audio_play_sound(bgm_main, 1, true);
-audio_sound_gain(bgm_main, 1, 300);
+//if (!audio_is_playing(bgm_main)) audio_play_sound(bgm_main, 1, true);
+//audio_sound_gain(bgm_main, 1, 300);

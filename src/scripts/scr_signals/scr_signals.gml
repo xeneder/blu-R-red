@@ -14,8 +14,8 @@
 /// A safety timeout clears a stale in-progress buffer after `SIGNAL_TIMEOUT`
 /// seconds so the player is never stuck mid-sequence.
 
-#macro SIGNAL_PING_RADIUS_DEFAULT  300
-#macro SIGNAL_PING_SPEED           720    // px/sec — reach 300px in ~0.42s
+#macro SIGNAL_PING_RADIUS_DEFAULT  400
+#macro SIGNAL_PING_SPEED           800    // px/sec
 #macro SIGNAL_RETURN_PING_RADIUS   90     // small echo emitted by pinged mines
 #macro SIGNAL_TIMEOUT              1      // seconds of silence before buffer clears
 #macro SIGNAL_COOLDOWN             0.05   // minimum seconds between code-pushing signals
@@ -242,8 +242,6 @@ function hero_damage(_amount, _from_x, _from_y) {
                 if (hp <= 0) {
                     game_over = true;
                     game_over_time = 0;
-                    // Duck the BGM so the world reads as paused.
-                    if (audio_is_playing(bgm_main)) audio_sound_gain(bgm_main, 0.25, 500);
                 }
             }
         }

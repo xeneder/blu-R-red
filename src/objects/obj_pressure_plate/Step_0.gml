@@ -1,13 +1,17 @@
 /// @description Press state follows whether the hero or a crawler is on top;
-///              push the new state to the linked door only when it flips.
+///              push the new state to EVERY door whose door_id matches ours.
 
 var _now_pressed = place_meeting(x, y, obj_hero)
                 || place_meeting(x, y, obj_enemy_crawler);
 
 if (_now_pressed != pressed) {
     pressed = _now_pressed;
-    if (instance_exists(linked_door)) {
-        linked_door.is_open = pressed;
+
+    // Fan out to every matching door — 1:N is allowed.
+    var _target = door_id;
+    var _state  = pressed;
+    with (obj_door_closed) {
+        if (door_id == _target) is_open = _state;
     }
 
     // Seed a new fg-slide animation from the current position.
