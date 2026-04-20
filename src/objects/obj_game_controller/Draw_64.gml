@@ -44,7 +44,32 @@ if (game_over) {
     // SDF font scales cleanly — we're leaning on that here.
     draw_text_transformed(_gw * 0.5, _gh * 0.5, "GAME OVER", 3.5, 3.5, 0);
 
+    // "PRESS CONFIRM" prompt — pulses subtly once the overlay settles so
+    // the player reads it as interactive rather than pure titling.
+    var _prompt_reveal = clamp((game_over_time - RESTART_INPUT_DELAY) / 0.4, 0, 1);
+    if (_prompt_reveal > 0) {
+        var _pulse = 0.75 + 0.25 * (0.5 + 0.5 * sin(game_over_time * 4));
+        draw_set_alpha(_fade * _prompt_reveal * _pulse);
+        draw_text_transformed(_gw * 0.5, _gh * 0.5 + 120,
+                              "PRESS CONFIRM", 1.2, 1.2, 0);
+    }
+
     draw_set_halign(fa_left);
     draw_set_valign(fa_top);
+    draw_set_alpha(1);
+}
+
+// --- Scene transition overlay (drawn over everything, including game over) ---
+if (transition_state != GC_TRANSITION.NONE) {
+    var _gw2  = display_get_gui_width();
+    var _gh2  = display_get_gui_height();
+    var _tt   = clamp(transition_t / TRANSITION_DURATION, 0, 1);
+    var _trans_alpha = (transition_state == GC_TRANSITION.FADING_OUT)
+        ? bezier_ease(_tt, BEZIER_EASE_IN_OUT)
+        : 1 - bezier_ease(_tt, BEZIER_EASE_IN_OUT);
+
+    draw_set_color(c_black);
+    draw_set_alpha(_trans_alpha);
+    draw_rectangle(0, 0, _gw2, _gh2, false);
     draw_set_alpha(1);
 }

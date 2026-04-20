@@ -49,3 +49,7 @@ if (eye_blink_ttl > 0) {
 // by a changing period while idle/move blend.
 var _period = lerp(IDLE_BOB_PERIOD, MOVE_BOB_PERIOD, move_factor);
 bob_phase = frac(bob_phase + (delta_time / 1000000) / _period);
+
+// Safety clamp — knockback & edge cases shouldn't launch us out of the room.
+x = clamp(x, 0, room_width);
+y = clamp(y, 0, room_height);

@@ -2,11 +2,13 @@
 
 #macro DOOR_ANIM_DURATION 0.45
 
-// Gameplay state. Flip via the pressure-plate hookup (stub below) or the
-// debug key in Step.
+// Gameplay state. Flip via a matching pressure plate (see obj_pressure_plate)
+// or the debug key in Step.
 is_open            = false;
 is_open_prev       = false;
-pressure_plate     = noone;   // stub — a future pressure plate instance id
+
+// door_id — instance-editor property, matched against obj_pressure_plate.door_id.
+if (!variable_instance_exists(id, "door_id")) door_id = 0;
 
 // Animation state.
 open_progress      = 0;       // 0 = fully closed, 1 = fully open

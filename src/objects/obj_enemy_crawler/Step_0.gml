@@ -84,3 +84,7 @@ if (stop_ttl <= 0) {
     var _period = is_moving ? CRAWLER_MOVE_BOB_PERIOD : CRAWLER_IDLE_BOB_PERIOD;
     bob_phase = frac(bob_phase + _dt / _period);
 }
+
+// Safety clamp — knockback / push code shouldn't launch crawlers out-of-bounds.
+x = clamp(x, 0, room_width);
+y = clamp(y, 0, room_height);

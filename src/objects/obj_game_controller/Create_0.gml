@@ -6,6 +6,17 @@ hp             = HP_MAX;
 game_over      = false;
 game_over_time = 0;       // seconds since game over started (for ease-in of text)
 
+// --- Scene transition state ---
+// If we just came back from a room_restart, start with a black-to-clear
+// fade-in. Otherwise idle. global.restart_fade_in is set by the fade-OUT
+// just before it calls room_restart().
+transition_state = GC_TRANSITION.NONE;
+transition_t     = 0;
+if (variable_global_exists("restart_fade_in") && global.restart_fade_in) {
+    global.restart_fade_in = false;
+    transition_state = GC_TRANSITION.FADING_IN;
+}
+
 signals_init();
 
 // --- Shared AI navigation grid ---

@@ -17,7 +17,7 @@
 #macro SIGNAL_PING_RADIUS_DEFAULT  300
 #macro SIGNAL_PING_SPEED           720    // px/sec — reach 300px in ~0.42s
 #macro SIGNAL_RETURN_PING_RADIUS   90     // small echo emitted by pinged mines
-#macro SIGNAL_TIMEOUT              1.5    // seconds of silence before buffer clears
+#macro SIGNAL_TIMEOUT              1      // seconds of silence before buffer clears
 #macro SIGNAL_COOLDOWN             0.05   // minimum seconds between code-pushing signals
 
 enum SIGNAL {
@@ -194,7 +194,6 @@ function mine_reveal(_mine) {
     with (_mine) {
         if (!revealed) {
             revealed = true;
-            reveal_cd = 0.5;
             var _p = instance_create_depth(x, y, -100, obj_ping);
             _p.max_radius      = SIGNAL_RETURN_PING_RADIUS;
             _p.ping_color      = SIGNAL.BLUE;
@@ -282,6 +281,17 @@ function ai_grid_refresh() {
     if (_ctrl.ai_grid < 0) return;
     mp_grid_clear_all(_ctrl.ai_grid);
     mp_grid_add_instances(_ctrl.ai_grid, obj_wall, false);
+}
+
+// --- Scene transition (game-over restart) -------------------------------
+#macro TRANSITION_DURATION   0.5        // seconds per fade phase
+#macro GAME_OVER_FADE_IN     0.8        // must match obj_game_controller Draw_64
+#macro RESTART_INPUT_DELAY   0.9        // block Confirm until overlay is settled
+
+enum GC_TRANSITION {
+    NONE,
+    FADING_OUT,    // leaving scene — clear → black — then room_restart()
+    FADING_IN,     // new scene spawns — black → clear
 }
 
 // --- Code effects --------------------------------------------------------

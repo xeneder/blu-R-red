@@ -1,5 +1,4 @@
 /// @description mine init
 
-// Mines have reveal CD
+// Mines have ping CD
 revealed = false
-reveal_cd = 0

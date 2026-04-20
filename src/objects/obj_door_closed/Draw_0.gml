@@ -41,11 +41,16 @@ if (_vis_w > 0) {
                      _frame_x + _half_w + _p * _half_w, _frame_y);
 }
 
-// Lock icon — the sprite is a full-frame canvas with the icon centred, so
-// drawing at the door's own (x, y) places the icon at the frame centre.
-var _fade = bezier_ease(_p, BEZIER_EASE_IN_OUT);
+// Lock icons — two-phase animation so both sprites are transparent when the
+// door is fully open (and, symmetrically, opaque when fully closed):
+//   first half  of open_progress: crossfade locked → unlocked
+//   second half of open_progress: unlocked fades out to transparency
+// Closing plays the same curve in reverse.
+var _lock_x   = _frame_x + _half_w + _p * _half_w;
+var _cross_t  = bezier_ease(clamp(_p * 2,       0, 1), BEZIER_EASE_IN_OUT);
+var _fade_t   = bezier_ease(clamp(_p * 2 - 1,   0, 1), BEZIER_EASE_IN_OUT);
+var _locked_alpha   = 1 - _cross_t;
+var _unlocked_alpha = _cross_t * (1 - _fade_t);
 
-var _lock_x = _frame_x + _half_w + _p * _half_w;
-
-draw_sprite_ext(spr_door_closed_lock_locked,   0, _lock_x, y, 1, 1, 0, c_white, 1 - _fade);
-draw_sprite_ext(spr_door_closed_lock_unlocked, 0, _lock_x, y, 1, 1, 0, c_white,     _fade);
+draw_sprite_ext(spr_door_closed_lock_locked,   0, _lock_x, y, 1, 1, 0, c_white, _locked_alpha);
+draw_sprite_ext(spr_door_closed_lock_unlocked, 0, _lock_x, y, 1, 1, 0, c_white, _unlocked_alpha);
